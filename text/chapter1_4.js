@@ -1,4 +1,4 @@
-window.quizConfig.chapters.push({ id: 4, name: "第4章：受動態" });
+window.quizConfig.chapters.push({ id: 4, name: "受動態" });
 
 window.quizConfig.questions.push(
     {ch: 4, q: "「〜される」「〜された」という、動作を受ける側の視点に立った文の形を（　）態と言いますか。", a: ["受動態", "受動", "受け身", "じゅどうたい", "うけみ"]},
