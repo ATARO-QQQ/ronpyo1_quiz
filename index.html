@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">公共 一問一答</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        h1 {
+            font-size: 1.4rem;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        .menu-screen {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .menu-screen p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .menu-btn {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            margin: 10px auto;
+            padding: 12px;
+            font-size: 1.05rem;
+            text-align: left;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .menu-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .progress {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .category-badge {
+            display: inline-block;
+            background-color: #666;
+            color: #fff;
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            margin-bottom: 10px;
+        }
+        .question-box {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-left: 5px solid #333;
+        }
+        .input-area {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            border: 1px solid #999;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        button.secondary {
+            background-color: #ccc;
+            color: #333;
+        }
+        button.secondary:hover {
+            background-color: #bbb;
+        }
+        .result-message {
+            margin-top: 15px;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .correct {
+            color: green;
+            background-color: #e6ffe6;
+            border: 1px solid green;
+        }
+        .incorrect {
+            color: red;
+            background-color: #ffe6e6;
+            border: 1px solid red;
+        }
+        .stats {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ccc;
+            font-size: 0.9rem;
+        }
+        .quiz-finished {
+            text-align: center;
+            padding: 40px 20px;
+        }
+    </style>
+    
+    <script>
+        window.quizConfig = {
+            title: "高校公共：記述式クイズ", 
+            maxQuestions: 50,              
+            chapters: [],                  
+            questions: []                  
+        };
+    </script>
+    
+    <script src="https://ataro-qqq.github.io/ronpyo_quiz/text/chapter1_1.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+    <h1 id="main-title">問題データを読み込み中...</h1>
+  
+    <div id="menu-screen" class="menu-screen">
+        <div id="menu-message">
+            <p>学習したい章を選択してください。問題がランダムに出題されます。</p>
+        </div>
+        <div id="menu-buttons">
+        </div>
+    </div>
+
+    <div id="quiz-screen" style="display: none;">
+        <div class="progress">
+            問題: <span id="current-q-num">1</span> / <span id="total-q-num">50</span>
+            | 章: <span id="category-name" class="category-badge"></span>
+        </div>
+        
+        <div id="question-text" class="question-box">
+            問題文がここに読み込まれます。
+        </div>
+
+        <div class="input-area">
+            <form id="quiz-form" onsubmit="checkAnswer(event)">
+                <input type="text" id="user-answer" placeholder="回答を入力してください" autocomplete="off" autofocus>
+                <div>
+                    <button type="submit">回答する</button>
+                    <button type="button" class="secondary" onclick="showAnswer()">答えを表示</button>
+                    <button type="button" class="secondary" onclick="nextQuestion()">スキップ</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="feedback" class="result-message" style="display: none;"></div>
+
+        <div class="stats">
+            正解数: <span id="correct-count">0</span> | 
+            誤答数: <span id="incorrect-count">0</span> | 
+            正解率: <span id="accuracy">0</span>%
+            <button onclick="backToMenu()" class="secondary" style="float: right; font-size: 0.8rem; padding: 2px 5px;">メニューに戻る</button>
+            <div style="clear: both;"></div>
+        </div>
+    </div>
+
+    <div id="result-screen" class="quiz-finished" style="display: none;">
+        <h2>クイズが終了しました！</h2>
+        <p>今回の学習結果</p>
+        <p style="font-size: 1.5rem; font-weight: bold;">
+            正解数: <span id="final-correct">0</span> / <span id="final-total">50</span> 問
+            (<span id="final-accuracy">0</span>%)
+        </p>
+        <button onclick="backToMenu()">もう一度挑戦する</button>
+    </div>
+</div>
+
+<script>
+let quizList = [];
+let currentQuestionIndex = 0;
+let correctCount = 0;
+let incorrectCount = 0;
+let answeredQuestions = 0;
+let totalQuestions = 0;
+
+window.onload = function() {
+    const mainTitle = document.getElementById("main-title");
+    const pageTitle = document.getElementById("page-title");
+    const menuButtons = document.getElementById("menu-buttons");
+    const menuMessage = document.getElementById("menu-message");
+
+    if (!window.quizConfig || window.quizConfig.chapters.length === 0) {
+        mainTitle.innerText = "データが未設定です";
+        menuMessage.innerHTML = "<p style='color: red; font-weight: bold;'>問題データが読み込まれていません。<br>chapter1.js などのファイルを作成し、HTMLの&lt;head&gt;内で読み込んでください。</p>";
+        return;
+    }
+
+    mainTitle.innerText = window.quizConfig.title;
+    pageTitle.innerText = window.quizConfig.title;
+
+    window.quizConfig.chapters.forEach(chapter => {
+        const qCount = window.quizConfig.questions.filter(q => q.ch === chapter.id).length;
+        
+        if (qCount > 0) {
+            const btn = document.createElement("button");
+            btn.className = "menu-btn";
+            btn.onclick = () => startQuiz(chapter.id, chapter.name);
+            btn.innerText = `■ 第${chapter.id}章 ${chapter.name} (${qCount}問)`;
+            menuButtons.appendChild(btn);
+        }
+    });
+
+    const totalQCount = window.quizConfig.questions.length;
+    if (totalQCount > 0) {
+        const allBtn = document.createElement("button");
+        allBtn.className = "menu-btn";
+        allBtn.style.backgroundColor = "#333";
+        allBtn.style.color = "#fff";
+        allBtn.onclick = () => startQuiz(0, "全章ミックス");
+        allBtn.innerText = `★ 全${window.quizConfig.chapters.length}章からランダムに出題 (${totalQCount}問)`;
+        menuButtons.appendChild(allBtn);
+    }
+};
+
+function startQuiz(chapterId, chapterName) {
+    if (!window.quizConfig) return;
+
+    if (chapterId === 0) {
+        quizList = [...window.quizConfig.questions];
+    } else {
+        quizList = window.quizConfig.questions.filter(q => q.ch === chapterId);
+    }
+
+    shuffleArray(quizList);
+    
+    const limit = window.quizConfig.maxQuestions || 50;
+    if (quizList.length > limit) {
+        quizList = quizList.slice(0, limit);
+    }
+
+    totalQuestions = quizList.length;
+    currentQuestionIndex = 0;
+    correctCount = 0;
+    incorrectCount = 0;
+    answeredQuestions = 0;
+
+    document.getElementById("menu-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    document.getElementById("result-screen").style.display = "none";
+    
+    document.getElementById("total-q-num").innerText = totalQuestions;
+    document.getElementById("category-name").innerText = chapterName;
+
+    showQuestion();
+    updateStats();
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function showQuestion() {
+    const q = quizList[currentQuestionIndex];
+    document.getElementById("current-q-num").innerText = currentQuestionIndex + 1;
+    document.getElementById("question-text").innerText = q.q;
+    document.getElementById("user-answer").value = "";
+    document.getElementById("feedback").style.display = "none";
+    document.getElementById("user-answer").focus();
+}
+
+function checkAnswer(event) {
+    if (event) event.preventDefault();
+    
+    const userVal = document.getElementById("user-answer").value.trim();
+    if (userVal === "") return; 
+
+    const q = quizList[currentQuestionIndex];
+    const normalizedUser = normalizeString(userVal);
+    
+    let isCorrect = false;
+    for (let i = 0; i < q.a.length; i++) {
+        if (normalizedUser === normalizeString(q.a[i])) {
+            isCorrect = true;
+            break;
+        }
+    }
+
+    const feedbackEl = document.getElementById("feedback");
+    feedbackEl.style.display = "block";
+
+    if (isCorrect) {
+        feedbackEl.className = "result-message correct";
+        feedbackEl.innerHTML = "◎ 正解です！<br>正解: " + q.a.join(" / ");
+        correctCount++;
+    } else {
+        feedbackEl.className = "result-message incorrect";
+        feedbackEl.innerHTML = "× 不正解。<br>正解は: <strong>" + q.a[0] + "</strong> です。";
+        incorrectCount++;
+    }
+
+    answeredQuestions++;
+    updateStats();
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 2000);
+}
+
+function showAnswer() {
+    const q = quizList[currentQuestionIndex];
+    const feedbackEl = document.getElementById("feedback");
+    feedbackEl.style.display = "block";
+    feedbackEl.className = "result-message incorrect";
+    feedbackEl.innerHTML = "正解は: <strong>" + q.a[0] + "</strong> です。";
+    
+    incorrectCount++;
+    answeredQuestions++;
+    updateStats();
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < totalQuestions) {
+        showQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function updateStats() {
+    document.getElementById("correct-count").innerText = correctCount;
+    document.getElementById("incorrect-count").innerText = incorrectCount;
+    const acc = answeredQuestions > 0 ? Math.round((correctCount / answeredQuestions) * 100) : 0;
+    document.getElementById("accuracy").innerText = acc;
+}
+
+function showResult() {
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "block";
+    
+    document.getElementById("final-correct").innerText = correctCount;
+    document.getElementById("final-total").innerText = totalQuestions;
+    const acc = answeredQuestions > 0 ? Math.round((correctCount / answeredQuestions) * 100) : 0;
+    document.getElementById("final-accuracy").innerText = acc;
+}
+
+function backToMenu() {
+    document.getElementById("quiz-screen").style.display = "none";
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("menu-screen").style.display = "block";
+}
+
+function normalizeString(str) {
+    if (!str) return "";
+    let result = str.toLowerCase();
+    
+    result = result.replace(/[Ａ-Ｚａ-ｚ０-９]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    });
+
+    result = result.replace(/[\u30a1-\u30f6]/g, function(match) {
+        var chr = match.charCodeAt(0) - 0x60;
+        return String.fromCharCode(chr);
+    });
+
+    result = result.replace(/[\s\s　・=\-－ー_＿.「」()（）]/g, "");
+    return result;
+}
+</script>
+
+</body>
+</html>
