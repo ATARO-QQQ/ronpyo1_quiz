@@ -1,4 +1,4 @@
-window.quizConfig.chapters.push({ id: 2, name: "第2章：英語の時制" });
+window.quizConfig.chapters.push({ id: 2, name: "英語の時制" });
 
 window.quizConfig.questions.push(
     {ch: 2, q: "英語の基本3時制とは、現在時制、過去時制と何時制ですか。", a: ["未来", "みらい"]},
