@@ -1,4 +1,4 @@
-window.quizConfig.chapters.push({ id: 5, name: "第4章：やさしい算数" });
+window.quizConfig.chapters.push({ id: 5, name: "やさしい算数" });
 
 window.quizConfig.questions.push(
     // 【代数・群・環・体】
