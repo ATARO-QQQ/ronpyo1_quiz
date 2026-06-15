@@ -1,4 +1,4 @@
-window.quizConfig.chapters.push({ id: 3, name: "第3章：助動詞" });
+window.quizConfig.chapters.push({ id: 3, name: "助動詞" });
 
 window.quizConfig.questions.push(
     {ch: 3, q: "助動詞（can, mustなど）の直後に置く動詞は、どのような形（活用）でなければなりませんか。", a: ["原形", "げんけい", "動詞の原形"]},
