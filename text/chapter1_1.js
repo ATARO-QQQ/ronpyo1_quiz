@@ -1,4 +1,4 @@
-window.quizConfig.chapters.push({ id: 1, name: "第1章：英語の5文型" });
+window.quizConfig.chapters.push({ id: 1, name: "英語の5文型" });
 
 window.quizConfig.questions.push(
     {ch: 1, q: "英語の文の要素で、文の主役となる「主語」をアルファベット1文字で何と表しますか。", a: ["S", "ｓ"]},
